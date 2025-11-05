@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>WA Quick Message — Kirim WhatsApp tanpa simpan nomor</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --card: #0b1220;
+        --muted: #94a3b8;
+        --accent: #16a34a;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto,
+          "Helvetica Neue", Arial;
+        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, #071029 0%, #07192f 100%);
+        color: #e6eef8;
+        padding: 24px;
+      }
+      .card {
+        width: 100%;
+        max-width: 720px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(2, 6, 23, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 20px;
+      }
+      p.lead {
+        margin: 0 0 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+      }
+      label {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 6px;
+        color: var(--muted);
+      }
+      input[type="text"],
+      textarea,
+      select {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: transparent;
+        color: inherit;
+        font-size: 15px;
+      }
+      textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+      .controls {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+      button {
+        background: linear-gradient(90deg, var(--accent), #059669);
+        border: 0;
+        padding: 10px 14px;
+        border-radius: 10px;
+        color: #061014;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button.ghost {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .small {
+        font-size: 13px;
+        padding: 8px 10px;
+        border-radius: 8px;
+      }
+      .note {
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .flex {
+        display: flex;
+        gap: 8px;
+      }
+      .grow {
+        flex: 1;
+      }
+      .copy-success {
+        color: #86efac;
+        font-size: 13px;
+        margin-left: 6px;
+      }
+      footer {
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      @media (max-width: 560px) {
+        .row {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card" role="main">
+      <h1>WA Quick Message</h1>
+      <p class="lead">
+        Kirim pesan WhatsApp tanpa harus menyimpan nomor. Gratis, ringan, bisa
+        di-host di GitHub Pages.
+      </p>
+
+      <div class="row">
+        <div style="flex: 0 0 120px">
+          <label for="country">Kode Negara</label>
+          <select id="country" aria-label="kode negara">
+            <option value="62" selected>+62 (Indonesia)</option>
+            <option value="1">+1 (USA/Canada)</option>
+            <option value="44">+44 (UK)</option>
+            <option value="81">+81 (Japan)</option>
+            <option value="91">+91 (India)</option>
+            <option value="">" + " + "Other" + "</option>
+          </select>
+        </div>
+        <div class="grow">
+          <label for="phone">Nomor (tanpa 0 di depan)</label>
+          <input
+            id="phone"
+            inputmode="numeric"
+            type="text"
+            placeholder="contoh: 81234567890"
+          />
+        </div>
+      </div>
+
+      <div style="margin-top: 12px">
+        <label for="msg">Pesan (opsional)</label>
+        <textarea
+          id="msg"
+          placeholder="Halo, saya ingin menanyakan... (boleh kosong)"
+        ></textarea>
+      </div>
+
+      <div class="controls">
+        <button id="openBtn">Buka di WhatsApp</button>
+        <button id="copyBtn" class="ghost small">Salin link</button>
+        <button id="clearBtn" class="ghost small">Bersihkan</button>
+        <div
+          id="copied"
+          class="copy-success"
+          aria-live="polite"
+          style="display: none"
+        >
+          Tersalin!
+        </div>
+      </div>
+
+      <div class="note">
+        Catatan: Masukkan nomor tanpa tanda '+' dan tanpa spasi. Contoh untuk
+        +62 812-3456-7890 → masukkan <strong>6281234567890</strong> atau pilih
+        kode negara +62 lalu masukkan <strong>81234567890</strong>. Jika nomor
+        belum terdaftar di WhatsApp, WhatsApp akan memberi tahu saat membuka
+        chat.
+      </div>
+
+      <footer>
+        &copy; WA Quick Message — Bisa langsung host di GitHub Pages (file:
+        <code>index.html</code>)
+      </footer>
+    </main>
+
+    <script>
+      const country = document.getElementById("country");
+      const phone = document.getElementById("phone");
+      const msg = document.getElementById("msg");
+      const openBtn = document.getElementById("openBtn");
+      const copyBtn = document.getElementById("copyBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const copied = document.getElementById("copied");
+
+      function normalizeNumber(cc, raw) {
+        // Remove everything except digits
+        const digits = raw.replace(/\D/g, "");
+        if (!digits) return "";
+        // if user already typed leading country code (e.g. 62812...) and selected same cc, allow it
+        if (digits.startsWith(cc)) return digits;
+        return cc + digits.replace(/^0+/, "");
+      }
+
+      function buildWaLink() {
+        const cc = country.value || "";
+        const raw = phone.value || "";
+        const text = msg.value || "";
+        const number = normalizeNumber(cc, raw);
+        if (!number) return null;
+        const encoded = encodeURIComponent(text);
+        // wa.me works well both in mobile and desktop
+        return `https://wa.me/${number}${encoded ? `?text=${encoded}` : ""}`;
+      }
+
+      openBtn.addEventListener("click", () => {
+        const link = buildWaLink();
+        if (!link) {
+          alert("Masukkan nomor tujuan terlebih dahulu.");
+          return;
+        }
+        window.open(link, "_blank");
+      });
+
+      copyBtn.addEventListener("click", async () => {
+        const link = buildWaLink();
+        if (!link) {
+          alert("Masukkan nomor tujuan terlebih dahulu.");
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(link);
+          copied.style.display = "inline";
+          setTimeout(() => (copied.style.display = "none"), 1500);
+        } catch (e) {
+          // fallback
+          prompt("Salin link ini:", link);
+        }
+      });
+
+      clearBtn.addEventListener("click", () => {
+        phone.value = "";
+        msg.value = "";
+        country.value = "62";
+      });
+
+      // quick validation: only allow digits, + and spaces while typing
+      phone.addEventListener("input", () => {
+        phone.value = phone.value.replace(/[^0-9+\s-]/g, "");
+      });
+
+      // allow enter to open
+      msg.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+          openBtn.click();
+        }
+      });
+    </script>
+  </body>
+</html>
